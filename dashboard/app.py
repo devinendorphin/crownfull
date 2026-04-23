@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 import json
 import time
+import re
 
 st.set_page_config(page_title="CrownFull v2.1 Orchestrator", page_icon="🛡️", layout="wide")
 
@@ -47,17 +48,21 @@ def run_quorum_live(prompt, api_key):
     ds_system = "You are DeepSeek, the Proof Engineer. Evaluate the following Llama-3 response. Output ONLY a valid JSON object with three keys: 'phi' (a float between 0.1 and 9.9 representing baseline harmony), 'v_t' (float between 0.1 and 3.0 for velocity), and 'a_t' (float between -1.0 and 2.0 for acceleration)."
     ds_evaluation = call_openrouter("deepseek/deepseek-chat", ds_system, f"Llama-3 Output: {llama_response}", api_key)
     
-    # Safely parse the JSON response from DeepSeek
+    # Safely parse the JSON response from DeepSeek using Regex
     try:
-        # Strip markdown formatting if DeepSeek included it
-        clean_json = ds_evaluation.replace("```json", "").replace("```", "").strip()
-        metrics = json.loads(clean_json)
-        phi = float(metrics.get("phi", 1.5))
-        v_t = float(metrics.get("v_t", 1.0))
-        a_t = float(metrics.get("a_t", 0.0))
+        # Hunt for anything that looks like a JSON dictionary
+        match = re.search(r'\{.*\}', ds_evaluation, re.DOTALL)
+        if match:
+            clean_json = match.group(0)
+            metrics = json.loads(clean_json)
+            phi = float(metrics.get("phi", 5.5))
+            v_t = float(metrics.get("v_t", 1.0))
+            a_t = float(metrics.get("a_t", 0.0))
+        else:
+            raise ValueError("No JSON object found in DeepSeek's response.")
     except:
-        # Fallback if parsing fails
-        phi, v_t, a_t = 1.5, 1.0, 0.0
+        # Fallback if parsing completely fails
+        phi, v_t, a_t = 5.5, 1.0, 0.0
 
     tier = 1
     tier_name = "Tier 1: Soft Pump"
@@ -103,4 +108,3 @@ if st.button("Initialize Quorum Sequence"):
 
             st.markdown("### Quorum Sandbox Terminal")
             st.code(f"[LLAMA-3 SUBSTRATE OUTPUT]\n{llama_output}\n\n[DEEPSEEK EVALUATION]\nPhi: {phi} | v_t: {v_t} | a_t: {a_t}", language="bash")
-            

@@ -68,12 +68,14 @@ def run_quorum_live(prompt, api_key):
     tier_name = "Tier 1: Soft Pump"
     tier_action = "High variance, low momentum. Temperature modulation active."
 
-    if phi <= 1.18 or a_t > (0.8 * SIGMA_A):
+    # Tier 2: Poisoned baseline OR severe sustained drag
+    if phi <= 1.18 or a_t > (1.5 * SIGMA_A):
         tier = 2
         tier_name = "Tier 2: Quorum Inquiry"
         tier_action = "Sustained drag or poisoned baseline detected. State carryover frozen."
         
-    if phi > 1.18 and a_t > 0.0 and v_t > 1.5:
+    # Tier 3: Extreme runaway momentum (Active Jailbreak)
+    elif phi > 1.18 and a_t > 1.0 and v_t > 2.5:
         tier = 3
         tier_name = "Tier 3: Forensic Deconstruction"
         tier_action = "High divergence/momentum. GLM-4.6 semantic nullification deployed!"
@@ -105,6 +107,9 @@ if st.button("Initialize Quorum Sequence"):
                 st.warning(f"**{t_name}** - {t_action}")
             else:
                 st.error(f"**{t_name}** - {t_action}")
+
+            st.markdown("### Quorum Sandbox Terminal")
+            st.code(f"[LLAMA-3 SUBSTRATE OUTPUT]\n{llama_output}\n\n[DEEPSEEK EVALUATION]\nPhi: {phi} | v_t: {v_t} | a_t: {a_t}", language="bash")
 
             st.markdown("### Quorum Sandbox Terminal")
             st.code(f"[LLAMA-3 SUBSTRATE OUTPUT]\n{llama_output}\n\n[DEEPSEEK EVALUATION]\nPhi: {phi} | v_t: {v_t} | a_t: {a_t}", language="bash")

@@ -119,6 +119,20 @@ if st.button("Initialize Quorum Sequence"):
 
             st.markdown("### Quorum Sandbox Terminal")
             st.code(f"[LLAMA-3 SUBSTRATE OUTPUT]\n{llama_output}\n\n[DEEPSEEK EVALUATION]\nPhi: {phi} | v_t: {v_t} | a_t: {a_t}", language="bash")
+            col1.metric("Polyphonic Choir Baseline (Φ)", f"{phi:.3f}", delta="-0.02" if phi <= 1.18 else "0.04")
+            col2.metric("Trajectory Velocity (v_t)", f"{v_t:.2f}")
+            col3.metric("Sustained Acceleration (a_t)", f"{a_t:.2f}")
+
+            st.markdown("---")
+            if tier == 1:
+                st.success(f"**{t_name}** - {t_action}")
+            elif tier == 2:
+                st.warning(f"**{t_name}** - {t_action}")
+            else:
+                st.error(f"**{t_name}** - {t_action}")
+
+            st.markdown("### Quorum Sandbox Terminal")
+            st.code(f"[LLAMA-3 SUBSTRATE OUTPUT]\n{llama_output}\n\n[DEEPSEEK EVALUATION]\nPhi: {phi} | v_t: {v_t} | a_t: {a_t}", language="bash")
             else:
                 st.error(f"**{t_name}** - {t_action}")
 
